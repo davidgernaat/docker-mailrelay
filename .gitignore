@@ -1,0 +1,40 @@
+# Sensitive files - NEVER commit these!
+secrets/
+*.txt
+*.key
+*.pem
+*.crt
+
+# Certificate files
+certs/*.pem
+certs/*.key
+certs/*.crt
+
+# Docker volumes and state
+relay_state/
+sasl_db/
+
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+
+# Docker build artifacts
+*.log
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Backup files
+*.backup
+*.bak
+
+# Local testing files
+test/
+tmp/
+

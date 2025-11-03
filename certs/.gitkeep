@@ -1,0 +1,4 @@
+# This directory stores TLS certificates
+# Add your fullchain.pem and privkey.pem here
+# These files are ignored by .gitignore for security
+

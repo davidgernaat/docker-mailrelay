@@ -1,0 +1,42 @@
+# Git files
+.git/
+.gitignore
+.github/
+
+# Documentation
+README.md
+*.md
+
+# Secrets and sensitive data
+secrets/
+*.txt
+*.key
+*.pem
+*.crt
+
+# Certificate files (will be mounted at runtime)
+certs/
+
+# Docker files
+docker-compose.yaml
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs and temporary files
+*.log
+tmp/
+test/
+
+# Backup files
+*.backup
+*.bak
+

@@ -1,0 +1,3 @@
+${FORWARD_DOMAIN} smtp:[${FORWARD_TARGET}]
+
+
