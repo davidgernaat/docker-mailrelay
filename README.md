@@ -21,7 +21,7 @@ Now in technical terms, this container runs a minimal Postfix relay with SASL-au
 6. Open firewall ports and change DNS settings accordingly (see below: ISP Port 25 Blocking)
 
 ## Prerequisites
-- ✅ VPS with open port 25 and rDNS
+- ✅ VPS with open port 25 and rDNS (see section: Setting Up rDNS (Reverse DNS) for Your VPS)
 - ✅ Docker installed
 - ✅ Valid TLS certificates
 - ✅ A running Docker-MailServer in your own home with at least one email account (https://github.com/docker-mailserver/docker-mailserver)
@@ -34,7 +34,7 @@ On a VPS:
 
 1) 📦 Install
 
-git clone THIS-URL
+git clone https://github.com/davidgernaat/docker-mailrelay
 
 2) 🔧 Copy valid certificates on the VPS (you already have them from you mail sever setup):
 
@@ -45,7 +45,9 @@ relay-docker/certs/privkey.pem
 
 3) 🔧 Configure according to INBOUND or OUTBOUND block.
 
-First test (read below: Test inbound-outbound port 25 blocking), then implement (read: Solutions)
+First test port 25 (read below: Test inbound-outbound port 25 blocking), 
+
+then implement (read: Solutions)
 
 5) 🚀 Build & run:
 
@@ -169,12 +171,13 @@ ufw allow 993
 ```
 
 **Home router:**
-# External 25  -> internal 25
-# External 143 -> internal 143
-# External 465 -> internal 465
-# External 587 -> internal 587
-# External 993 -> internal 993
-
+```bash
+ External 25  -> internal 25
+ External 143 -> internal 143
+ External 465 -> internal 465
+ External 587 -> internal 587
+ External 993 -> internal 993
+```
 
 #### INBOUND-BLOCKED port 25 (Internet → Home)
 
@@ -226,11 +229,13 @@ ufw allow 993
 ```
 
 **Home router:**
-# External 2525 -> internal 2525
-# External 143 -> internal 143
-# External 465 -> internal 465
-# External 587 -> internal 587
-# External 993 -> internal 993
+```bash
+ External 2525 -> internal 2525
+ External 143 -> internal 143
+ External 465 -> internal 465
+ External 587 -> internal 587
+ External 993 -> internal 993
+```
 
 #### Both 25 Blocked
 
@@ -263,8 +268,8 @@ This section explains all the environment variables available in `docker-compose
 
 | Variable | Description | Example | Required |
 |----------|-------------|---------|----------|
-| `FORWARD_DOMAIN` | Domain to forward emails for (only if inbound port 25 is blocked) | `yourdomain.com` | ❌ |
-| `FORWARD_TARGET` | Target mail server for forwarding (only if inbound port 25 is blocked) | `mail.yourdomain.com:2525` | ❌ |
+| `FORWARD_DOMAIN` | Domain to forward emails for (only if inbound port 25 is blocked) | `yourdomain.com` | Only when INBOUND port 25 is blocked |
+| `FORWARD_TARGET` | Target mail server for forwarding (only if inbound port 25 is blocked) | `mail.yourdomain.com:2525` | Only when INBOUND port 25 is blocked |
 
 ### ⚡ Queue Management Configuration to keep exposure to a minmum
 
@@ -304,6 +309,53 @@ Then type:
 ```
 AUTH LOGIN THEGENERATEDBASE64STRING
 ```
+
+## Setting Up rDNS (Reverse DNS) for Your VPS
+
+Reverse DNS (rDNS) is **critical** for mail servers. Without proper rDNS, most mail servers will reject your emails or mark them as spam.
+
+### 🔍 What is rDNS?
+
+rDNS maps your VPS IP address back to your domain name. When other mail servers receive email from your relay, they check:
+- **Forward DNS**: Does `relay.yourdomain.tld` resolve to your VPS IP? ✓
+- **Reverse DNS**: Does your VPS IP resolve back to `relay.yourdomain.tld`? ✓
+
+Both must match!
+
+### ✅ Why It's Required
+
+- **Email Deliverability**: Gmail, Outlook, and other providers require valid rDNS
+- **Spam Prevention**: Servers without rDNS are often blocked
+- **Reputation**: Proper rDNS shows you're a legitimate mail server
+
+### 🔧 How to Set Up rDNS
+
+**Step 1: Set rDNS in Your VPS Provider's Control Panel**
+
+The process varies by provider:
+- Look for: "Reverse DNS", "PTR Record", or "rDNS" in your control panel
+- Contact support if you can't find it - all reputable VPS providers support this
+
+**Step 2: ✅ Verify rDNS Setup**
+
+After setting up, verify it works:
+
+```bash
+$ dig -x 203.0.113.42 +short
+relay.yourdomain.tld.
+
+$ dig relay.yourdomain.tld +short
+203.0.113.42
+```
+
+Both directions must match!
+
+### ⚠️ Important Notes
+
+- **DNS Propagation**: rDNS changes can take 1-24 hours to propagate
+- **Match Your Certificate**: The rDNS should match your TLS certificate hostname
+- **One IP per hostname**: Each IP can only have one rDNS entry
+- **Required for port 25**: If you're receiving email (port 25 open), rDNS is mandatory
 
 ## Security Features
 
