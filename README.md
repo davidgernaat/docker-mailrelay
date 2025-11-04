@@ -6,7 +6,7 @@ Many people have port 25 blocked by their Internet Service Providers (ISPs). Thi
 
 A common solution is to setup an email-relay-account at some unknown email-relay-provider that sends and receives mail on your behalf. No solution really, given the reason you want to host a mail server in the first place.
 
-With docker-mail-relay 🐳 you can host your own email-relay-provider at any vps that has port 25 open. All you have to do is point your mail-server at home to your vps to circumvent your ISP.
+With docker-mail-relay 🐳 you can host your own email-relay-provider at any vps that has port 25 open. All you have to do is point your home mail-server to your vps to circumvent your ISP.
 
 Keep your family's privacy 🚀 Secure communications with family and friends. Host your own mail for the whole family in your own home. 📧
 
@@ -34,7 +34,14 @@ On a VPS:
 
 1) 📦 Install
 
+```
 git clone https://github.com/davidgernaat/docker-mailrelay
+```
+
+```
+docker pull ghcr.io/davidgernaat/docker-mailrelay:latest
+docker pull davidgernaat/docker-mailrelay:latest
+```
 
 2) 🔧 Copy valid certificates on the VPS (you already have them from you mail sever setup):
 
@@ -45,9 +52,9 @@ relay-docker/certs/privkey.pem
 
 3) 🔧 Configure according to INBOUND or OUTBOUND block.
 
-First test port 25 (read below: Test inbound-outbound port 25 blocking), 
+First test port 25 (read below: Test inbound-outbound port 25 blocking)
 
-then implement (read: Solutions)
+Then implement (read: Solutions)
 
 5) 🚀 Build & run:
 
@@ -330,22 +337,28 @@ Both must match!
 
 ### 🔧 How to Set Up rDNS
 
-**Step 1: Set rDNS in Your VPS Provider's Control Panel**
+**Step 1: Create a new A record subdomain**
+
+```bash
+relay.yourdomain.tld.
+```
+
+**Step 2: Set rDNS in Your VPS Provider's Control Panel**
 
 The process varies by provider:
 - Look for: "Reverse DNS", "PTR Record", or "rDNS" in your control panel
 - Contact support if you can't find it - all reputable VPS providers support this
 
-**Step 2: ✅ Verify rDNS Setup**
+**Step 3: ✅ Verify**
 
 After setting up, verify it works:
 
 ```bash
-$ dig -x 203.0.113.42 +short
+$ dig -x 1.2.3.4 +short
 relay.yourdomain.tld.
 
 $ dig relay.yourdomain.tld +short
-203.0.113.42
+1.2.3.4
 ```
 
 Both directions must match!
@@ -425,3 +438,10 @@ The relay includes resource limits to prevent resource exhaustion attacks:
 - `files/entrypoint.sh`: Renders configs, creates SASL user, starts services
 - `files/entrypoint.sh.backup`: Backup of original entrypoint script
 - `docker-compose.yaml`: Orchestration
+
+## Credits
+
+- [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver)
+- [Postfix](https://www.postfix.org/)
+- [ifthen:else blog post](https://ifthenel.se/self-hosted-mail-server/)
+
